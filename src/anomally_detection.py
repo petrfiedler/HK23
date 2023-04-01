@@ -1,5 +1,6 @@
 from chunk_noise_detection import chunk_noise
 import numpy as np
+import math
 
 def noise_indeces(chunks):
     """returns the indeces of the noise in the original dataset
@@ -34,7 +35,7 @@ def detect_anomallies(data, max_chunk_size=10_000, n_runs=5, seed=42):
     anomallies = {}
     for run in range(n_runs):
         shuffled = data.sample(frac=1, random_state=seed+run)
-        chunks = np.array_split(shuffled, shuffled.shape[0] // max_chunk_size)
+        chunks = np.array_split(shuffled, math.ceil(shuffled.shape[0] / max_chunk_size))
         
         anomally_indeces = noise_indeces(chunks)
         for index in anomally_indeces:
