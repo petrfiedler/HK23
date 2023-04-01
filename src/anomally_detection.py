@@ -1,4 +1,4 @@
-from chunk_noise_detection import chunk_noise
+from src.chunk_noise_detection import chunk_noise
 import numpy as np
 import math
 
