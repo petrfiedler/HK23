@@ -31,10 +31,11 @@ def detect_anomallies(data, max_chunk_size=10_000, n_runs=5, seed=42):
         dict: dictionary of anomally indeces and number their occurences, the higher the number, the more probable the anomally
     """
 
+    anomallies = {}
     for run in range(n_runs):
-        shuffled = data.sample(frac=1, random_state=seed)
+        shuffled = data.sample(frac=1, random_state=seed+run)
         chunks = np.array_split(shuffled, shuffled.shape[0] // max_chunk_size)
-        anomallies = {}
+        
         anomally_indeces = noise_indeces(chunks)
         for index in anomally_indeces:
             anomallies[index] = anomallies.get(index, 0) + 1
