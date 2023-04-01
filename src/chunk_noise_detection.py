@@ -1,5 +1,5 @@
 from sklearn.cluster import dbscan
-from preprocessing import preprocess
+from src.preprocessing import preprocess
 import numpy as np
 
 def chunk_noise(chunk, eps=0.5, min_samples=5):
