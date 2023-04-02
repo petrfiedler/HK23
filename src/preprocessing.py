@@ -88,6 +88,13 @@ def process_inodes(data):
     return data.drop(columns=['inode', 'timestamp'])
 
 
+def add_important_source_names(data):
+    important_sources = data['source_name'].value_counts()[:5].index
+    for source in important_sources:
+        data["Log source: " + source] = data['source_name'] == source
+    return data
+
+
 def standardize(data):
     standard_scaler = StandardScaler()
     return pd.DataFrame(standard_scaler.fit_transform(data), columns=data.columns)
@@ -104,6 +111,7 @@ def preprocess_file(data):
 
 
 def preprocess_event(data):
+    data = add_important_source_names(data)
     data = drop_columns_event(data)
     data = retype_event(data)
     data = get_minute_frequency(data)
