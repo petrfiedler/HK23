@@ -3,11 +3,15 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 
 
-def drop_columns(data):
+def drop_columns_file(data):
     return data.drop(columns=['Unnamed: 0', 'id', 'filename', 'extra', 'datetime', 'file_path', 'name', 'typef', 'dir_type', 'file_type', 'is_allocated', 'is_allocated0', 'sha_256', 'epochtime', 'hour', 'minute'])
 
 
-def retype(data):
+def drop_columns_event(data):
+    return data.drop(columns=['Unnamed: 0', 'execution_process_id', 'keywords_wdi_context', 'audit_detailed_tracking', 'id', 'datetime', 'computer_name', 'source_name', 'filename_type', 'user_sid', 'channel', 'keywords', 'epochtime', 'hour', 'minute'])
+
+
+def retype_file(data):
     bools = [
         'M', 'A', 'C', 'B',
         'file_stat', 'NTFS_file_stat', 'file_entry_shell_item', 'NTFS_USN_change',
@@ -16,6 +20,38 @@ def retype(data):
         'file_executable', 'file_graphic', 'file_documents', 'file_ps', 'file_other',
         'mft', 'lnk_shell_items', 'olecf_olecf_automatic_destinations/lnk/shell_items', 'winreg_bagmru/shell_items', 'usnjrnl',
         'is_allocated1'
+    ]
+
+    data[bools] = data[bools].astype('boolean')
+
+    data['timestamp'] = data['timestamp'].astype('datetime64[ns]')
+
+    return data
+
+
+def retype_event(data):
+    bools = [
+        'filename_security',
+        'filename_application',
+        'filename_system',
+        'filename_rdp',
+        'filename_powershell',
+        'filename_other',
+        'recovered',
+        'audit_account_logon',
+        'audit_account_management',
+        'audit_logon_logoff',
+        'audit_ds_access',
+        'audit_object_access',
+        'audit_policy_change',
+        'audit_privilege_usage',
+        'audit_system',
+        'keywords_audit_failure',
+        'keywords_audit_success',
+        'keywords_correlation_hint',
+        'keywords_event_log_classic',
+        'keywords_sqm',
+        'keywords_wdi_diagnostic'
     ]
 
     data[bools] = data[bools].astype('boolean')
@@ -57,10 +93,19 @@ def standardize(data):
     return pd.DataFrame(standard_scaler.fit_transform(data), columns=data.columns)
 
 
-def preprocess(data):
-    data = drop_columns(data)
-    data = retype(data)
+def preprocess_file(data):
+    data = drop_columns_file(data)
+    data = retype_file(data)
     data = process_file_size(data)
+    data = get_minute_frequency(data)
+    data = process_inodes(data)
+    data = standardize(data)
+    return data
+
+
+def preprocess_event(data):
+    data = drop_columns_event(data)
+    data = retype_event(data)
     data = get_minute_frequency(data)
     data = process_inodes(data)
     data = standardize(data)
