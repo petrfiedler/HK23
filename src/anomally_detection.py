@@ -2,7 +2,7 @@ from src.chunk_noise_detection import chunk_noise
 import numpy as np
 import math
 
-def noise_indeces(chunks):
+def noise_indeces(chunks, mode):
     """returns the indeces of the noise in the original dataset
 
     Args:
@@ -11,15 +11,18 @@ def noise_indeces(chunks):
     Returns:
         set{index}: indeces from the original dataset that could be anomallies
     """
+    
+    if mode not in ['file', 'mode']:
+        raise ValueError("mode must be 'file' or 'event'")
 
     noise = set()
     for chunk in chunks:
-        noise_labels = chunk_noise(chunk)
+        noise_labels = chunk_noise(chunk, mode)
         noise = noise.union(noise_labels)
     return noise
 
 
-def detect_anomallies(data, max_chunk_size=10_000, n_runs=5, seed=42):
+def detect_anomallies(data, mode='file', max_chunk_size=10_000, n_runs=5, seed=42):
     """Detects anomallies in the data
 
     Args:
@@ -32,12 +35,15 @@ def detect_anomallies(data, max_chunk_size=10_000, n_runs=5, seed=42):
         dict: dictionary of anomally indeces and number their occurences, the higher the number, the more probable the anomally
     """
 
+    if mode not in ['file', 'mode']:
+        raise ValueError("mode must be 'file' or 'event'")
+
     anomallies = {}
     for run in range(n_runs):
         shuffled = data.sample(frac=1, random_state=seed+run)
         chunks = np.array_split(shuffled, math.ceil(shuffled.shape[0] / max_chunk_size))
         
-        anomally_indeces = noise_indeces(chunks)
+        anomally_indeces = noise_indeces(chunks, mode)
         for index in anomally_indeces:
             anomallies[index] = anomallies.get(index, 0) + 1
     return anomallies
