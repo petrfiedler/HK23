@@ -11,8 +11,8 @@ def noise_indeces(chunks, mode):
     Returns:
         set{index}: indeces from the original dataset that could be anomallies
     """
-    
-    if mode not in ['file', 'mode']:
+
+    if mode not in ['file', 'event']:
         raise ValueError("mode must be 'file' or 'event'")
 
     noise = set()
@@ -35,7 +35,7 @@ def detect_anomallies(data, mode='file', max_chunk_size=10_000, n_runs=5, seed=4
         dict: dictionary of anomally indeces and number their occurences, the higher the number, the more probable the anomally
     """
 
-    if mode not in ['file', 'mode']:
+    if mode not in ['file', 'event']:
         raise ValueError("mode must be 'file' or 'event'")
 
     anomallies = {}
