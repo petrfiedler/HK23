@@ -1,6 +1,7 @@
 from src.chunk_noise_detection import chunk_noise
 import numpy as np
 import math
+import pandas as pd
 
 def noise_indeces(chunks, mode):
     """returns the indeces of the noise in the original dataset
@@ -46,4 +47,7 @@ def detect_anomallies(data, mode='file', max_chunk_size=10_000, n_runs=5, seed=4
         anomally_indeces = noise_indeces(chunks, mode)
         for index in anomally_indeces:
             anomallies[index] = anomallies.get(index, 0) + 1
-    return anomallies
+
+    anomallies = pd.Series(anomallies)
+    anomallies = anomallies[anomallies >= anomallies.max() // 2]
+    return data.iloc[anomallies.index].copy()
